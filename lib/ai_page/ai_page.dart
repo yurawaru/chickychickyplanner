@@ -1,4 +1,4 @@
-import 'package:chickychickyplanner/ai_page/ai_funtion.dart';
+import 'package:chickychickyplanner/ai_page/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class AiPage extends StatefulWidget {
@@ -51,7 +51,7 @@ class _AiPageState extends State<AiPage> {
                           color: Color.fromARGB(255, 76, 46, 2),
                         ),
                       ),
-                      Expanded(child: AiFunction()),
+                      Expanded(child: ChatScreen()),
                     ]),
               ),
             ],
