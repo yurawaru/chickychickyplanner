@@ -16,7 +16,7 @@ enum HomeTab {
   ai,
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final HomeTab selectedTab;
 
   const HomePage({
@@ -24,57 +24,64 @@ class HomePage extends StatelessWidget {
     super.key,
   });
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.selectedTab.index;
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _tapBottomNavigationBarItem(BuildContext context, int index) {
     final nav = Provider.of<NavigationService>(context, listen: false);
-    switch (index) {
-      case 0:
-        nav.goHome(tab: HomeTab.table);
-        break;
-      case 1:
-        nav.goHome(tab: HomeTab.checklist);
-        break;
-      case 2:
-        nav.goHome(tab: HomeTab.timer);
-        break;
-      case 3:
-        nav.goHome(tab: HomeTab.chart);
-        break;
-      case 4:
-        nav.goHome(tab: HomeTab.ai);
-        break;
-    }
+    nav.goHome(tab: HomeTab.values[index]);
+
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
+    setState(() {
+      _currentPage = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> tabs = [
-      {
-        'page': const TablePage(),
-        'title': 'Table Page',
-      },
-      {
-        'page': const ChecklistPage(),
-        'title': 'Checklist Page',
-      },
-      {
-        'page': const TimerPage(),
-        'title': 'Timer Page',
-      },
-      {
-        'page': const ChartPage(),
-        'title': 'Chart Page',
-      },
-      {
-        'page': const AiPage(),
-        'title': 'AI Page',
-      },
+    final List<Widget> tabs = [
+      const TablePage(),
+      const ChecklistPage(),
+      const TimerPage(),
+      const ChartPage(),
+      const AiPage(),
     ];
 
     return Scaffold(
-      body: tabs[selectedTab.index]['page'],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (int index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
+        children: tabs,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (index) => _tapBottomNavigationBarItem(context, index),
-        currentIndex: selectedTab.index,
+        currentIndex: _currentPage,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
         items: const [
