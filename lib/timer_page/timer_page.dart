@@ -16,10 +16,10 @@ class TimerPage extends StatefulWidget {
   });
 
   @override
-  _TimerPageState createState() => _TimerPageState();
+  TimerPageState createState() => TimerPageState();
 }
 
-class _TimerPageState extends State<TimerPage> {
+class TimerPageState extends State<TimerPage> {
   TextEditingController hoursController = TextEditingController();
   TextEditingController minutesController = TextEditingController();
   bool valid = false;

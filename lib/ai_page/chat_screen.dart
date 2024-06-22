@@ -1,5 +1,5 @@
 import 'package:chickychickyplanner/Model/chat_message.dart';
-import 'package:chickychickyplanner/Service/chat.dart';
+import 'package:chickychickyplanner/service/chat.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {

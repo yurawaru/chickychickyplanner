@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           onGenerateRoute: (settings) {
             WidgetBuilder builder;
+            RouteTransitionsBuilder transitionBuilder = fadeTransition;
             switch (settings.name) {
               case '/':
                 builder = (BuildContext context) => const StartPage();
@@ -64,35 +65,41 @@ class MyApp extends StatelessWidget {
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.table,
                     );
+                transitionBuilder = fadeTransition;
                 break;
               case '/checklist':
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.checklist,
                     );
+                transitionBuilder = fadeTransition;
                 break;
               case '/timer':
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.timer,
                     );
+                transitionBuilder = fadeTransition;
                 break;
               case '/chart':
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.chart,
                     );
+                transitionBuilder = fadeTransition;
                 break;
               case '/ai':
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.ai,
                     );
+                transitionBuilder = fadeTransition;
                 break;
               default:
                 builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.table,
                     );
+                break;
             }
             return CustomTransitionPage<void>(
               child: builder(context),
-              transitionsBuilder: fadeTransition,
+              transitionsBuilder: transitionBuilder,
             ).createRoute(context);
           },
         );
