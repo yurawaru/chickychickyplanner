@@ -1,5 +1,4 @@
 import 'package:chickychickyplanner/main.dart';
-
 import 'package:chickychickyplanner/home.dart';
 
 class NavigationService {

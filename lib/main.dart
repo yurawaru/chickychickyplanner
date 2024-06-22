@@ -2,6 +2,7 @@ import 'package:chickychickyplanner/Provider/collections_provider.dart';
 import 'package:chickychickyplanner/Provider/task_provider.dart';
 import 'package:chickychickyplanner/Provider/overview_provider.dart';
 import 'package:chickychickyplanner/Provider/timer_provider.dart';
+import 'package:chickychickyplanner/animation_page.dart';
 import 'package:chickychickyplanner/home.dart';
 import 'package:chickychickyplanner/start_page/no_tutorial_page.dart';
 import 'package:chickychickyplanner/start_page/start_page.dart';
@@ -47,31 +48,52 @@ class MyApp extends StatelessWidget {
           theme: brightness == Brightness.light ? theme.light() : theme.dark(),
           navigatorKey: navigatorKey,
           initialRoute: '/',
-          routes: {
-            '/': (context) => const StartPage(),
-            '/no_tutorial': (context) => const NoTutorialPage(),
-            '/tutorial': (context) => const TutorialPage(),
-            '/table': (context) => const HomePage(
-                  selectedTab: HomeTab.table,
-                ),
-            '/checklist': (context) => const HomePage(
-                  selectedTab: HomeTab.checklist,
-                ),
-            '/timer': (context) => const HomePage(
-                  selectedTab: HomeTab.timer,
-                ),
-            '/chart': (context) => const HomePage(
-                  selectedTab: HomeTab.chart,
-                ),
-            '/ai': (context) => const HomePage(
-                  selectedTab: HomeTab.ai,
-                ),
-          },
-          onUnknownRoute: (settings) {
-            return MaterialPageRoute(
-                builder: (_) => const HomePage(
+          onGenerateRoute: (settings) {
+            WidgetBuilder builder;
+            switch (settings.name) {
+              case '/':
+                builder = (BuildContext context) => const StartPage();
+                break;
+              case '/no_tutorial':
+                builder = (BuildContext context) => const NoTutorialPage();
+                break;
+              case '/tutorial':
+                builder = (BuildContext context) => const TutorialPage();
+                break;
+              case '/table':
+                builder = (BuildContext context) => const HomePage(
                       selectedTab: HomeTab.table,
-                    ));
+                    );
+                break;
+              case '/checklist':
+                builder = (BuildContext context) => const HomePage(
+                      selectedTab: HomeTab.checklist,
+                    );
+                break;
+              case '/timer':
+                builder = (BuildContext context) => const HomePage(
+                      selectedTab: HomeTab.timer,
+                    );
+                break;
+              case '/chart':
+                builder = (BuildContext context) => const HomePage(
+                      selectedTab: HomeTab.chart,
+                    );
+                break;
+              case '/ai':
+                builder = (BuildContext context) => const HomePage(
+                      selectedTab: HomeTab.ai,
+                    );
+                break;
+              default:
+                builder = (BuildContext context) => const HomePage(
+                      selectedTab: HomeTab.table,
+                    );
+            }
+            return CustomTransitionPage<void>(
+              child: builder(context),
+              transitionsBuilder: fadeTransition,
+            ).createRoute(context);
           },
         );
       },
