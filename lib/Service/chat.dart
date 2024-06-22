@@ -30,7 +30,7 @@ class ChatService {
         _messagesStreamController.add(List.from(_messages));
       }
     } catch (e) {
-      print('Failed to load chat history: $e');
+      throw Exception('Failed to load chat history: $e');
     }
   }
 
@@ -40,7 +40,7 @@ class ChatService {
       String messagesJson = jsonEncode(_messages);
       await prefs.setString('chat_history', messagesJson);
     } catch (e) {
-      print('Failed to save chat history: $e');
+      throw Exception('Failed to save chat history: $e');
     }
   }
 
@@ -51,7 +51,7 @@ class ChatService {
       _messages.clear();
       _messagesStreamController.add(List.from(_messages));
     } catch (e) {
-      print('Failed to clear chat history: $e');
+      throw Exception('Failed to clear chat history: $e');
     }
   }
 
@@ -61,6 +61,7 @@ class ChatService {
   }
 
   Future<void> fetchPromptResponse(String prompt) async {
+    String fullPrompt = _buildFullPrompt(prompt);
     _messages.insert(0, ChatMessage(role: 'User Chicky Chicky', text: prompt));
     _messages.insert(
         0, ChatMessage(role: 'AI Assistant', text: 'Generating response...'));
@@ -68,9 +69,9 @@ class ChatService {
 
     var requestBody = jsonEncode({
       'providers': 'cohere',
-      'text': prompt,
+      'text': fullPrompt,
       'temperature': 0.2,
-      'max_tokens': 250,
+      'max_tokens': 1000,
     });
 
     var response = await http.post(
@@ -100,8 +101,16 @@ class ChatService {
     }
 
     _messagesStreamController.add(List.from(_messages));
-
     saveChatHistory();
+  }
+
+  String _buildFullPrompt(String currentPrompt) {
+    StringBuffer fullPromptBuffer = StringBuffer(currentPrompt);
+    for (int i = 1; i < _messages.length; i++) {
+      fullPromptBuffer.write(' ');
+      fullPromptBuffer.write(_messages[i].text);
+    }
+    return fullPromptBuffer.toString();
   }
 
   void dispose() {
