@@ -19,10 +19,61 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatService.fetchMessages();
   }
 
+  void clearChatHistory() {
+    _chatService.clearChatHistory();
+  }
+
+  void showDeleteChatConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Chat History?'),
+          content:
+              const Text('Are you sure you want to delete the chat history?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                _chatService.clearChatHistory();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            PopupMenuButton<int>(
+              icon: const Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 1,
+                  child: Text('Delete Chat'),
+                ),
+              ],
+              onSelected: (value) {
+                if (value == 1) {
+                  showDeleteChatConfirmation(context);
+                }
+              },
+            ),
+          ],
+        ),
         Expanded(
           child: StreamBuilder<List<ChatMessage>>(
             stream: _chatService.messagesStream,
@@ -34,15 +85,15 @@ class _ChatScreenState extends State<ChatScreen> {
               } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 return ListView.builder(
                   reverse: true,
-                  itemCount: snapshot.data!.length + 1, // one extra for padding
+                  itemCount: snapshot.data!.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return const SizedBox(height: 16);
                     }
                     final message = snapshot.data![index - 1];
                     return ListTile(
-                      title: Text(message.role[0].toUpperCase() +
-                          message.role.substring(1)),
+                      title: Text(message.role,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(message.text),
                     );
                   },
@@ -65,7 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   controller: _textController,
                   decoration:
                       const InputDecoration(hintText: 'Enter your prompt'),
-                  maxLines: null, // Allows input to expand
+                  maxLines: null,
                 ),
               ),
               const SizedBox(width: 16.0),

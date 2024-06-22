@@ -2,67 +2,106 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:chickychickyplanner/Model/chat_message.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatService {
-  static const String _apiKey =
-      'YOUR_API_KEY'; // FIXME: Replace with your API key
-  static const String _url = 'https://api.openai.com/v1/chat/completions';
+  static const String _apiKey = 'API_KEY';
+  static const String _url = 'https://api.edenai.run/v2/text/generation';
 
   final _messagesStreamController =
       StreamController<List<ChatMessage>>.broadcast();
-  // Assume that the messages are stored in descending order (latest message first)
   final List<ChatMessage> _messages = [];
 
   Stream<List<ChatMessage>> get messagesStream =>
       _messagesStreamController.stream;
 
+  ChatService() {
+    loadChatHistory();
+  }
+
+  Future<void> loadChatHistory() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? messagesJson = prefs.getString('chat_history');
+      if (messagesJson != null) {
+        Iterable decoded = jsonDecode(messagesJson);
+        _messages.clear();
+        _messages.addAll(decoded.map((item) => ChatMessage.fromJson(item)));
+        _messagesStreamController.add(List.from(_messages));
+      }
+    } catch (e) {
+      print('Failed to load chat history: $e');
+    }
+  }
+
+  Future<void> saveChatHistory() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String messagesJson = jsonEncode(_messages);
+      await prefs.setString('chat_history', messagesJson);
+    } catch (e) {
+      print('Failed to save chat history: $e');
+    }
+  }
+
+  Future<void> clearChatHistory() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('chat_history');
+      _messages.clear();
+      _messagesStreamController.add(List.from(_messages));
+    } catch (e) {
+      print('Failed to clear chat history: $e');
+    }
+  }
+
   Future<void> fetchMessages() async {
-    // Simulating fetching past messages (not applicable with OpenAI's completions API directly)
     await Future.delayed(const Duration(seconds: 1));
     _messagesStreamController.add(List.of(_messages));
   }
 
   Future<void> fetchPromptResponse(String prompt) async {
-    _messages.insert(0, ChatMessage(role: 'user', text: prompt));
+    _messages.insert(0, ChatMessage(role: 'User Chicky Chicky', text: prompt));
     _messages.insert(
-      0,
-      ChatMessage(role: 'assistant', text: 'Generating response...'),
-    );
+        0, ChatMessage(role: 'AI Assistant', text: 'Generating response...'));
     _messagesStreamController.add(List.from(_messages));
 
-    // 1. Send the prompt and ENTIRE HISTORY to the chat completions API. If only the prompt is sent, the assistant will not remember the context of the conversation.
-    var history = _messages
-        .where((message) => message.text != 'Generating response...')
-        .map((message) => {
-              'role': message.role,
-              'content': message.text,
-            })
-        .toList()
-        .reversed
-        .toList();
+    var requestBody = jsonEncode({
+      'providers': 'cohere',
+      'text': prompt,
+      'temperature': 0.2,
+      'max_tokens': 250,
+    });
+
     var response = await http.post(
       Uri.parse(_url),
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': 'Bearer $_apiKey',
+        'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-        'model': 'gpt-3.5-turbo', // Specify the model you're using
-        'messages': history,
-      }),
+      body: requestBody,
     );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch response: ${response.statusCode}');
     }
 
-    // 2. Update local messages list with the assistant's response
-    var data = json.decode(utf8.decode(response.bodyBytes));
-    var responses = data['choices'][0]['message']['content'].trim();
-    _messages[0] = ChatMessage(role: 'assistant', text: responses);
+    var data = json.decode(response.body);
+    if (data != null && data['cohere'] != null) {
+      var assistantResponse = data['cohere']['generated_text'];
+      if (assistantResponse != null) {
+        _messages[0] =
+            ChatMessage(role: 'AI Assistant', text: assistantResponse);
+      } else {
+        throw Exception('Empty assistant response');
+      }
+    } else {
+      throw Exception('Unexpected API response format');
+    }
 
-    // 4. Update the stream with the new messages list
     _messagesStreamController.add(List.from(_messages));
+
+    saveChatHistory();
   }
 
   void dispose() {
