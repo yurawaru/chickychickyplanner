@@ -24,6 +24,8 @@ class TutorialPageState extends State<TutorialPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
+    } else {
+      Navigator.of(context).pop();
     }
   }
 
@@ -33,6 +35,9 @@ class TutorialPageState extends State<TutorialPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.ease,
       );
+    } else {
+      // Navigate to '/table' when on the last page
+      MyApp.navigatorKey.currentState!.pushNamed('/table');
     }
   }
 
@@ -107,35 +112,53 @@ class TutorialPageState extends State<TutorialPage> {
   }
 
   Widget _buildTutorialPage(String text, Color color) {
-    return Container(
-      color: color,
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 24, color: Colors.white),
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        int sensitivity = 20;
+        if (details.delta.dx > sensitivity) {
+          _goToPreviousPage();
+        } else if (details.delta.dx < -sensitivity) {
+          _goToNextPage();
+        }
+      },
+      child: Container(
+        color: color,
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 24, color: Colors.white),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildLastTutorialPage(String text, Color color) {
-    return Container(
-      color: color,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(fontSize: 24, color: Colors.white),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              MyApp.navigatorKey.currentState!.pushNamed('/table');
-            },
-            child: const Text('Get Started'),
-          ),
-        ],
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        int sensitivity = 20;
+        if (details.delta.dx > sensitivity) {
+          _goToPreviousPage();
+        } else if (details.delta.dx < -sensitivity) {
+          _goToNextPage();
+        }
+      },
+      child: Container(
+        color: color,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              style: const TextStyle(fontSize: 24, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _goToNextPage,
+              child: const Text('Get Started'),
+            ),
+          ],
+        ),
       ),
     );
   }

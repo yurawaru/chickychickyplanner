@@ -55,3 +55,24 @@ RouteTransitionsBuilder scaleTransition =
     child: child,
   );
 };
+
+RouteTransitionsBuilder noTransition =
+    (context, animation, secondaryAnimation, child) {
+  return child;
+};
+
+class NoTransitionPage<T> extends Page<T> {
+  final Widget child;
+
+  const NoTransitionPage({required this.child, super.key, super.name});
+
+  @override
+  Route<T> createRoute(BuildContext context) {
+    return PageRouteBuilder<T>(
+      settings: this,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    );
+  }
+}
