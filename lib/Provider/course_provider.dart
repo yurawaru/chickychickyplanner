@@ -13,15 +13,19 @@ class CourseProvider with ChangeNotifier {
   ];
 
   final List<DataRow> _rows = [];
-  final List<String> _coursename = [];
+  final List<String> _courseName = [];
   final List<String> _timeslots = [];
   final List<String> _courseId = [];
+  final List<String> _courseCredit = [];
+  final List<String> _courseType = [];
 
   List<String> get courseTypeIndex => _courseTypeIndex;
   List<DataRow> get rows => _rows;
-  List<String> get coursename => _coursename;
+  List<String> get coursename => _courseName;
   List<String> get courseId => _courseId;
   List<String> get timeslots => _timeslots;
+  List<String> get courseCredit => _courseCredit;
+  List<String> get courseType => _courseType;
 
   void addRow(DataRow newRow) {
     _rows.add(newRow);
@@ -33,33 +37,22 @@ class CourseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addCourseName(String name) {
-    _coursename.add(name);
+  void addCourse(
+      String name, String id, String schedule, String credit, String type) {
+    _courseName.add(name);
+    _courseId.add(id);
+    _timeslots.add(schedule);
+    _courseCredit.add(credit);
+    _courseType.add(type);
     notifyListeners();
   }
 
-  void removeCourseName(int index) {
-    _coursename.removeAt(index);
-    notifyListeners();
-  }
-
-  void addCourseIndex(String index) {
-    _courseId.add(index);
-    notifyListeners();
-  }
-
-  void removeCourseIndex(int index) {
+  void removeCourse(int index) {
+    _courseName.removeAt(index);
     _courseId.removeAt(index);
-    notifyListeners();
-  }
-
-  void addTime(String time) {
-    timeslots.add(time);
-    notifyListeners();
-  }
-
-  void removeTime(int index) {
-    timeslots.removeAt(index);
+    _timeslots.removeAt(index);
+    _courseCredit.removeAt(index);
+    _courseType.removeAt(index);
     notifyListeners();
   }
 }

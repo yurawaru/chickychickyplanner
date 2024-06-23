@@ -1,6 +1,9 @@
 import 'package:chickychickyplanner/Model/chat_message.dart';
+import 'package:chickychickyplanner/provider/prompt_text_provider.dart';
+import 'package:chickychickyplanner/provider/task_provider.dart';
 import 'package:chickychickyplanner/service/chat.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -53,87 +56,93 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            PopupMenuButton<int>(
-              icon: const Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 1,
-                  child: Text('Delete Chat'),
-                ),
-              ],
-              onSelected: (value) {
-                if (value == 1) {
-                  showDeleteChatConfirmation(context);
-                }
-              },
-            ),
-          ],
-        ),
-        Expanded(
-          child: StreamBuilder<List<ChatMessage>>(
-            stream: _chatService.messagesStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: snapshot.data!.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return const SizedBox(height: 16);
-                    }
-                    final message = snapshot.data![index - 1];
-                    return ListTile(
-                      title: Text(message.role,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(message.text),
-                    );
-                  },
-                );
-              } else {
-                return const Center(
-                    child: Text('Enter a prompt to get a response'));
-              }
-            },
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.surfaceVariant,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+    return Consumer<PromptTextProvider>(
+        builder: (context, promptTextProvider, _) {
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _textController,
-                  decoration:
-                      const InputDecoration(hintText: 'Enter your prompt'),
-                  maxLines: null,
-                ),
-              ),
-              const SizedBox(width: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  if (_textController.text.isNotEmpty) {
-                    _chatService
-                        .fetchPromptResponse(_textController.text.trim());
-                    _textController.clear();
+              PopupMenuButton<int>(
+                icon: const Icon(Icons.more_vert),
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 1,
+                    child: Text('Delete Chat'),
+                  ),
+                ],
+                onSelected: (value) {
+                  if (value == 1) {
+                    showDeleteChatConfirmation(context);
                   }
                 },
-                child: const Text('Send'),
               ),
             ],
           ),
-        ),
-      ],
-    );
+          Expanded(
+            child: StreamBuilder<List<ChatMessage>>(
+              stream: _chatService.messagesStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return ListView.builder(
+                    reverse: true,
+                    itemCount: snapshot.data!.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return const SizedBox(height: 16);
+                      }
+                      final message = snapshot.data![index - 1];
+                      return ListTile(
+                        title: Text(message.role,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(message.text),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(
+                      child: Text('Enter a prompt to get a response'));
+                }
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _textController,
+                    decoration:
+                        const InputDecoration(hintText: 'Enter your prompt'),
+                    maxLines: null,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_textController.text.isNotEmpty) {
+                      _chatService.fetchPromptResponse(
+                        _textController.text.trim(),
+                        promptTextProvider,
+                      );
+                      _textController.clear();
+                    }
+                  },
+                  child: const Text('Send'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    });
   }
 }

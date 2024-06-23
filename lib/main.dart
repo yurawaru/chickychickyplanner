@@ -4,7 +4,8 @@ import 'package:chickychickyplanner/Provider/overview_provider.dart';
 import 'package:chickychickyplanner/Provider/timer_provider.dart';
 import 'package:chickychickyplanner/animation_page.dart';
 import 'package:chickychickyplanner/home.dart';
-import 'package:chickychickyplanner/start_page/no_tutorial_page.dart';
+import 'package:chickychickyplanner/provider/prompt_text_provider.dart';
+import 'package:chickychickyplanner/start_page/options.dart';
 import 'package:chickychickyplanner/start_page/start_page.dart';
 import 'package:chickychickyplanner/start_page/tutorial_page.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +20,12 @@ void main() {
     MultiProvider(
       providers: [
         Provider<NavigationService>(create: (_) => NavigationService()),
-        ChangeNotifierProvider(create: (context) => CourseProvider()),
+        ChangeNotifierProvider(create: (_) => CourseProvider()),
         ChangeNotifierProvider(create: (_) => TableProvider()),
-        ChangeNotifierProvider(create: (context) => TaskProvider()),
-        ChangeNotifierProvider(create: (context) => TimerProvider()),
-        ChangeNotifierProvider(create: (context) => ItemCollectionProvider()),
+        ChangeNotifierProvider(create: (_) => TimerProvider()),
+        ChangeNotifierProvider(create: (_) => ItemCollectionProvider()),
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(create: (_) => PromptTextProvider()),
       ],
       child: const MyApp(),
     ),
@@ -55,8 +57,8 @@ class MyApp extends StatelessWidget {
               case '/':
                 builder = (BuildContext context) => const StartPage();
                 break;
-              case '/no_tutorial':
-                builder = (BuildContext context) => const NoTutorialPage();
+              case '/options':
+                builder = (BuildContext context) => const OptionsPage();
                 break;
               case '/tutorial':
                 builder = (BuildContext context) => const TutorialPage();
