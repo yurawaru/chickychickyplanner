@@ -1,6 +1,8 @@
 import 'package:chickychickyplanner/Provider/course_provider.dart';
+import 'package:chickychickyplanner/provider/prompt_text_provider.dart';
 import 'package:chickychickyplanner/table_page/new_row.dart';
 import 'package:chickychickyplanner/Provider/overview_provider.dart';
+import 'package:chickychickyplanner/table_page/time_parse_tostring.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -47,6 +49,8 @@ class _ListTabState extends State<ListTab> {
       final courseProvider =
           Provider.of<CourseProvider>(context, listen: false);
       final tableProvider = Provider.of<TableProvider>(context, listen: false);
+      final promptTextProvider =
+          Provider.of<PromptTextProvider>(context, listen: false);
       final uniqueId = _uuid.v4();
       final newRow = DataRow(
         cells: [
@@ -71,10 +75,10 @@ class _ListTabState extends State<ListTab> {
         ],
       );
       courseProvider.addRow(newRow);
-      courseProvider.addCourseName(courseName);
-      courseProvider.addCourseIndex(uniqueId);
+      courseProvider.addCourse(courseName, uniqueId, time, credit, typeText);
       tableProvider.updateTable(courseName, time);
-      courseProvider.addTime(time);
+      promptTextProvider.appendText(
+          'I have add $courseName course that has $credit credits at time ${parseSchedule(time)} to the schedule, the category of this course is $typeText.');
     });
   }
 
@@ -83,11 +87,14 @@ class _ListTabState extends State<ListTab> {
       final courseProvider =
           Provider.of<CourseProvider>(context, listen: false);
       final tableProvider = Provider.of<TableProvider>(context, listen: false);
+      final promptTextProvider =
+          Provider.of<PromptTextProvider>(context, listen: false);
+      promptTextProvider.deleteSentence(
+          'I have add ${courseProvider.coursename[index]} course that has ${courseProvider.courseCredit[index]} credits at time ${parseSchedule(courseProvider.timeslots[index])} to the schedule, the category of this course is ${courseProvider.courseType[index]}.');
       courseProvider.removeRow(index);
-      courseProvider.removeCourseName(index);
-      courseProvider.removeCourseIndex(index);
       tableProvider.updateTable('', courseProvider.timeslots[index]);
-      courseProvider.removeTime(index);
+      courseProvider.removeCourse(index);
+
       Navigator.of(context).pop();
     });
   }

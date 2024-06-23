@@ -1,5 +1,5 @@
 import 'package:chickychickyplanner/Model/course.dart';
-import 'package:chickychickyplanner/table_page/time_parse.dart';
+import 'package:chickychickyplanner/table_page/time_parse_check.dart';
 import 'package:flutter/material.dart';
 
 class NewRow extends StatefulWidget {

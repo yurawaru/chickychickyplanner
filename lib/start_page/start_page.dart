@@ -19,25 +19,18 @@ class StartPage extends StatelessWidget {
                 const SizedBox(
                   height: 350,
                   child: Text(
-                    'First time using?',
+                    'Get Better Study With Chicky Chicky',
                     style: TextStyle(
-                      fontSize: 70,
+                      fontSize: 56,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    MyApp.navigatorKey.currentState!.pushNamed('/tutorial');
+                    MyApp.navigatorKey.currentState!.pushNamed('/options');
                   },
-                  child: const Text('Started Tutorial'),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    MyApp.navigatorKey.currentState!.pushNamed('/no_tutorial');
-                  },
-                  child: const Text('Skip Tutorial'),
+                  child: const Text('Get Started'),
                 ),
               ],
             ),
