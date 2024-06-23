@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatService {
-  static const String _apiKey = 'API_KEY';
+  static const String _apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMWIzZmFkYjQtZmE4ZC00NmVlLTk3NzUtZjFjOTI2NDkxNTBiIiwidHlwZSI6ImFwaV90b2tlbiJ9.vbZAKUJagVQTC5askGVhGEPQjymseaRt4qkiT3_NQTM';
   static const String _url = 'https://api.edenai.run/v2/text/generation';
 
   final _messagesStreamController =

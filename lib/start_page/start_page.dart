@@ -19,7 +19,7 @@ class StartPage extends StatelessWidget {
                 const SizedBox(
                   height: 350,
                   child: Text(
-                    'First time using?',
+                    'First Time Using?',
                     style: TextStyle(
                       fontSize: 70,
                       fontWeight: FontWeight.bold,
