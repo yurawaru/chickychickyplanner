@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:chickychickyplanner/Model/chat_message.dart';
+import 'package:chickychickyplanner/provider/prompt_text_provider.dart';
+import 'package:chickychickyplanner/provider/task_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatService {
-  static const String _apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMWIzZmFkYjQtZmE4ZC00NmVlLTk3NzUtZjFjOTI2NDkxNTBiIiwidHlwZSI6ImFwaV90b2tlbiJ9.vbZAKUJagVQTC5askGVhGEPQjymseaRt4qkiT3_NQTM';
+  static const String _apiKey = 'API_KEY';
   static const String _url = 'https://api.edenai.run/v2/text/generation';
 
   final _messagesStreamController =
@@ -60,8 +62,10 @@ class ChatService {
     _messagesStreamController.add(List.of(_messages));
   }
 
-  Future<void> fetchPromptResponse(String prompt) async {
-    String fullPrompt = _buildFullPrompt(prompt);
+  Future<void> fetchPromptResponse(
+      String prompt, PromptTextProvider promptTextProvider) async {
+    String fullPrompt = _buildFullPrompt(promptTextProvider.text + prompt);
+
     _messages.insert(0, ChatMessage(role: 'User Chicky Chicky', text: prompt));
     _messages.insert(
         0, ChatMessage(role: 'AI Assistant', text: 'Generating response...'));
@@ -102,6 +106,7 @@ class ChatService {
 
     _messagesStreamController.add(List.from(_messages));
     saveChatHistory();
+    //taskProvider.promptTextTaskClear();
   }
 
   String _buildFullPrompt(String currentPrompt) {

@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chickychickyplanner/Model/task.dart';
 import 'package:chickychickyplanner/Provider/course_provider.dart';
 import 'package:chickychickyplanner/Provider/task_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ChecklistFunction extends StatefulWidget {
   const ChecklistFunction({super.key});
@@ -13,9 +13,10 @@ class ChecklistFunction extends StatefulWidget {
 
 class _ChecklistFunctionState extends State<ChecklistFunction> {
   final TextEditingController _taskController = TextEditingController();
+  DateTime? _selectedDate;
   Task? _editedTask;
 
-  void addTaskInfo(BuildContext context, String courseId) {
+  void addTaskInfo(BuildContext context, String courseId, String courseName) {
     final taskText = _taskController.text;
     if (taskText.isNotEmpty) {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
@@ -29,49 +30,112 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
             isDone: false,
             id: taskId,
             courseId: courseId,
+            courseName: courseName,
+            dueDate: _selectedDate,
           ),
         );
       } else {
-        taskProvider.editTask(_editedTask!, taskText);
+        taskProvider.editTask(_editedTask!, taskText, _selectedDate);
         _editedTask = null;
       }
 
       _taskController.clear();
+      _selectedDate = null;
       Navigator.of(context).pop();
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Invalid Name'),
+            content: const Text('Please enter a task name.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
-  void addTaskDialog(String courseId, [Task? taskToEdit]) {
+  void addTaskDialog(String courseId, String courseName, [Task? taskToEdit]) {
     if (taskToEdit != null) {
       _taskController.text = taskToEdit.title;
+      _selectedDate = taskToEdit.dueDate;
       _editedTask = taskToEdit;
     }
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(_editedTask == null ? 'New Task' : 'Edit Task'),
-          content: TextField(
-            controller: _taskController,
-            decoration: const InputDecoration(labelText: 'Task'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _taskController.clear();
-                _editedTask = null;
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                addTaskInfo(context, courseId);
-              },
-              child: const Text('Save'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(_editedTask == null ? 'New Task' : 'Edit Task'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _taskController,
+                    decoration: const InputDecoration(labelText: 'Task'),
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    title: Text(
+                      _selectedDate == null
+                          ? 'No due date chosen'
+                          : 'Due Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            _selectedDate = pickedDate;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _taskController.clear();
+                    _selectedDate = null;
+                    _editedTask = null;
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    addTaskInfo(
+                      context,
+                      courseId,
+                      courseName,
+                    );
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -79,10 +143,8 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = Provider.of<TaskProvider>(context);
-
-    return Consumer<CourseProvider>(
-      builder: (context, courseProvider, _) {
+    return Consumer2<CourseProvider, TaskProvider>(
+      builder: (context, courseProvider, taskProvider, _) {
         return ListView.builder(
           itemCount: courseProvider.courseId.length,
           itemBuilder: (context, index) {
@@ -104,12 +166,13 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
               child: Column(
                 children: [
                   ListTile(
-                      title: Text(
-                    courseName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    title: Text(
+                      courseName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  )),
+                  ),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -128,18 +191,31 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
                           child: const Icon(Icons.delete, color: Colors.white),
                         ),
                         child: ListTile(
-                          title: AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 300),
-                            style: item.isDone
-                                ? const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey,
-                                  )
-                                : const TextStyle(
-                                    decoration: TextDecoration.none,
-                                    color: Colors.black,
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 300),
+                                style: item.isDone
+                                    ? const TextStyle(
+                                        decoration: TextDecoration.lineThrough,
+                                        color: Colors.grey,
+                                      )
+                                    : const TextStyle(
+                                        decoration: TextDecoration.none,
+                                        color: Colors.black,
+                                      ),
+                                child: Text(item.title),
+                              ),
+                              if (item.dueDate != null)
+                                Text(
+                                  'Due: ${item.dueDate!.toLocal().toString().split(' ')[0]}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.italic,
                                   ),
-                            child: Text(item.title),
+                                ),
+                            ],
                           ),
                           leading: Checkbox(
                             value: item.isDone,
@@ -150,7 +226,7 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
                           trailing: IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                              addTaskDialog(courseId, item);
+                              addTaskDialog(courseId, courseName, item);
                             },
                           ),
                         ),
@@ -160,7 +236,7 @@ class _ChecklistFunctionState extends State<ChecklistFunction> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: ElevatedButton(
-                      onPressed: () => addTaskDialog(courseId),
+                      onPressed: () => addTaskDialog(courseId, courseName),
                       style: ElevatedButton.styleFrom(
                         foregroundColor:
                             const Color.fromARGB(255, 255, 252, 247),

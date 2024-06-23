@@ -1,8 +1,8 @@
 import 'package:chickychickyplanner/main.dart';
 import 'package:flutter/material.dart';
 
-class NoTutorialPage extends StatelessWidget {
-  const NoTutorialPage({super.key});
+class OptionsPage extends StatelessWidget {
+  const OptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +19,25 @@ class NoTutorialPage extends StatelessWidget {
                 const SizedBox(
                   height: 350,
                   child: Text(
-                    'Get Better Study With Chicky Chicky',
+                    'First time using?',
                     style: TextStyle(
-                      fontSize: 56,
+                      fontSize: 70,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    MyApp.navigatorKey.currentState!.pushNamed('/tutorial');
+                  },
+                  child: const Text('Started Tutorial'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
                     MyApp.navigatorKey.currentState!.pushNamed('/table');
                   },
-                  child: const Text('Get Started'),
+                  child: const Text('Skip Tutorial'),
                 ),
               ],
             ),

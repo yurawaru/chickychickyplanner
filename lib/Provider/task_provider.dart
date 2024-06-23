@@ -20,10 +20,11 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void editTask(Task task, String newTitle) {
+  void editTask(Task task, String newTitle, DateTime? selectedDate) {
     final taskIndex = _tasks.indexWhere((t) => t.id == task.id);
     if (taskIndex != -1) {
       _tasks[taskIndex].title = newTitle;
+      _tasks[taskIndex].dueDate = selectedDate;
       notifyListeners();
     }
   }
@@ -36,5 +37,20 @@ class TaskProvider with ChangeNotifier {
       }
     }
     return itemsForCourse;
+  }
+
+  List<String> taskList = [];
+
+  String promptTextTask() {
+    int len = _tasks.length;
+    for (int i = 0; i < len; i++) {
+      taskList.add(
+          'Course: ${_tasks[i].courseName}, Task name: ${_tasks[i].title}, Complete: ${_tasks[i].isDone.toString()}, Deadline: ${_tasks[i].dueDate == null ? 'No due date chosen' : _tasks[i].dueDate!.toLocal().toString().split(' ')[0]}');
+    }
+    return taskList.join('\n');
+  }
+
+  void promptTextTaskClear() {
+    taskList.clear();
   }
 }
