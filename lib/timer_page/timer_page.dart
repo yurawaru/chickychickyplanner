@@ -300,17 +300,17 @@ class TimerPageState extends State<TimerPage> {
   Widget buildCharacter(TimerProvider timerProvider) {
     int timeIndicator = timerProvider.maxSeconds - timerProvider.seconds;
 
-    if (timeIndicator > 0 && timeIndicator <= 3600) {
+    if (timeIndicator > 0 && timeIndicator < 3600) {
       timerProvider.currentImageLevel = 0;
-    } else if (timeIndicator > 3600 && timeIndicator <= 7200) {
+    } else if (timeIndicator >= 3600 && timeIndicator < 7200) {
       timerProvider.currentImageLevel = 1;
-    } else if (timeIndicator > 7200 && timeIndicator <= 10800) {
+    } else if (timeIndicator >= 7200 && timeIndicator < 10800) {
       timerProvider.currentImageLevel = 2;
-    } else if (timeIndicator > 10800 && timeIndicator <= 14400) {
+    } else if (timeIndicator >= 10800 && timeIndicator < 14400) {
       timerProvider.currentImageLevel = 3;
-    } else if (timeIndicator > 14400 && timeIndicator <= 18000) {
+    } else if (timeIndicator >= 14400 && timeIndicator < 18000) {
       timerProvider.currentImageLevel = 4;
-    } else if (timeIndicator > 18000) {
+    } else if (timeIndicator >= 18000) {
       timerProvider.currentImageLevel = 5;
     }
     return Stack(
