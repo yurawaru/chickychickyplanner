@@ -43,7 +43,8 @@ class TableProvider with ChangeNotifier {
         return 12;
       default:
         int value = int.tryParse(text) ?? -1;
-        return (value > 0 && value < 10) ? value : -1;
+        value -= 1;
+        return (value >= 0 && value < 10) ? value : -1;
     }
   }
 }

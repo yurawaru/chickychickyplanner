@@ -26,7 +26,7 @@ class _ListTabState extends State<ListTab> {
     "Others",
   ];
 
-  final Uuid _uuid = Uuid();
+  final Uuid _uuid = const Uuid();
 
   void _openAddRowOverlay(BuildContext context) {
     showModalBottomSheet(
