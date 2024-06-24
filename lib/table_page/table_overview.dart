@@ -68,7 +68,7 @@ class _OverviewTabState extends State<OverviewTab> {
                   ),
               ],
             ),
-            for (var i = 1; i < 13; i++)
+            for (var i = 0; i < 13; i++)
               Row(
                 children: [
                   Container(
@@ -76,8 +76,15 @@ class _OverviewTabState extends State<OverviewTab> {
                     height: 50,
                     color: Colors.grey[200],
                     child: Center(
-                      child: i > 9 ? Text(specialPeriod[i - 10]) : Text('$i'),
-                    ),
+                        child: Text(
+                      i > 9
+                          ? specialPeriod[i - 10]
+                          : i == 4
+                              ? 'n'
+                              : i > 4
+                                  ? '$i'
+                                  : '${i + 1}',
+                    )),
                   ),
                   for (var j = 0; j < 7; j++)
                     Container(
@@ -159,7 +166,7 @@ class FullScreenOverview extends StatelessWidget {
                         ),
                     ],
                   ),
-                  for (var i = 1; i < 13; i++)
+                  for (var i = 0; i < 13; i++)
                     Row(
                       children: [
                         Container(
@@ -167,10 +174,15 @@ class FullScreenOverview extends StatelessWidget {
                           height: 50,
                           color: Colors.grey[200],
                           child: Center(
-                            child: i > 9
-                                ? Text(specialPeriod[i - 10])
-                                : Text('$i'),
-                          ),
+                              child: Text(
+                            i > 9
+                                ? specialPeriod[i - 10]
+                                : i == 4
+                                    ? 'n'
+                                    : i > 4
+                                        ? '$i'
+                                        : '${i + 1}',
+                          )),
                         ),
                         for (var j = 0; j < 7; j++)
                           Container(
