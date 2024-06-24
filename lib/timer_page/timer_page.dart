@@ -175,7 +175,7 @@ class TimerPageState extends State<TimerPage> {
                               ),
                               buildCourseDropdownMenu(timerProvider, courses),
                               const SizedBox(
-                                height: 20,
+                                height: 15,
                               ),
                               Stack(
                                 alignment: Alignment.center,
@@ -189,11 +189,11 @@ class TimerPageState extends State<TimerPage> {
                                 ],
                               ),
                               const SizedBox(
-                                height: 20,
+                                height: 10,
                               ),
                               buildButton(timerProvider, coursesAvailable),
                               const SizedBox(
-                                height: 20,
+                                height: 10,
                               ),
                             ],
                           ),
@@ -314,7 +314,7 @@ Widget buildCourseDropdownMenu(
             decoration: const InputDecoration(
               labelText: 'Hours',
               border: OutlineInputBorder(
-                borderSide: BorderSide(width: 2), // Set border width here
+                borderSide: BorderSide(width: 10), // Set border width here
               ),
               filled: true,
               fillColor: Colors.white,
