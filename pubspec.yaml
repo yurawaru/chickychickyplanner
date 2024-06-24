@@ -33,5 +33,5 @@ flutter:
     - lib/images/Plant_element/
     - lib/images/Poison_element/
     - lib/images/Water_element/
-    - lib/images/IMG_2695.PNG
+    - lib/images/Decorations/
     - lib/env/.env
