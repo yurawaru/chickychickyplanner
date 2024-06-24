@@ -34,4 +34,6 @@ flutter:
     - lib/images/Poison_element/
     - lib/images/Water_element/
     - lib/images/Decorations/
+    - lib/images/Icons/Bottom_Navigator_Interacted_Icons/
+    - lib/images/Icons/Bottom_Navigator_Default_Icons/
     - lib/env/.env
